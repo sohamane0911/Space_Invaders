@@ -5,6 +5,12 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
 
+# Game window setup (same as main code)
+screen_width = 1534
+screen_height = 900
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Space Invaders")
+
 running = True
 
 while running:
@@ -14,4 +20,4 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-pygame.quit()
+    pygame.display.update()
