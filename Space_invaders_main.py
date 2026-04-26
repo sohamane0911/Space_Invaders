@@ -1,4 +1,5 @@
 import pygame
+import random
 
 pygame.init()
 pygame.mixer.init()
@@ -19,6 +20,20 @@ main_menu_bg = pygame.transform.scale(
 bg = pygame.image.load("bg moving.png").convert()
 bg_height = bg.get_height()
 
+player = pygame.transform.scale(
+    pygame.image.load("ship.gif").convert(),
+    (96, 96)
+)
+
+player_lives = pygame.transform.scale(
+    pygame.image.load("ship.gif").convert(),
+    (32, 32)
+)
+
+player_x = 733
+player_y = 770
+player_speed = 20
+
 running = True
 
 while running:
@@ -29,6 +44,8 @@ while running:
             running = False
 
     screen.blit(main_menu_bg, (0, 0))
+
+    screen.blit(player, (player_x, player_y))
 
     pygame.display.update()
 
