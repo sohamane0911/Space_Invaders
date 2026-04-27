@@ -34,6 +34,16 @@ player_x = 733
 player_y = 770
 player_speed = 20
 
+enemy = pygame.transform.scale(
+    pygame.image.load("enemyShip.gif").convert(),
+    (96, 96)
+)
+
+enemy_x = [random.randint(0, screen_width - 96) for _ in range(4)]
+enemy_y = [-50, -300, -600, -900]
+
+enemy_speed = [5, 5, 5, 5]
+
 running = True
 
 while running:
@@ -44,6 +54,15 @@ while running:
             running = False
 
     screen.blit(main_menu_bg, (0, 0))
+
+    for i in range(len(enemy_x)):
+        enemy_y[i] += enemy_speed[i]
+
+        if enemy_y[i] > screen_height:
+            enemy_y[i] = -100
+            enemy_x[i] = random.randint(0, screen_width - 96)
+
+        screen.blit(enemy, (enemy_x[i], enemy_y[i]))
 
     screen.blit(player, (player_x, player_y))
 
