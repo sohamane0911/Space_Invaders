@@ -41,8 +41,23 @@ enemy = pygame.transform.scale(
 
 enemy_x = [random.randint(0, screen_width - 96) for _ in range(4)]
 enemy_y = [-50, -300, -600, -900]
-
 enemy_speed = [5, 5, 5, 5]
+
+laser_x = [733, 733, 748, 748]
+laser_y = [770, 770, 770, 770]
+
+laser_speed_x = [15]
+laser_speed_y = [30]
+
+laser1l_active = False
+laser1r_active = False
+laser2l_active = False
+laser2r_active = False
+
+laserl1_rect = pygame.Rect(0, 0, 64, 64)
+laserl2_rect = pygame.Rect(0, 0, 64, 64)
+laserr1_rect = pygame.Rect(0, 0, 64, 64)
+laserr2_rect = pygame.Rect(0, 0, 64, 64)
 
 running = True
 
