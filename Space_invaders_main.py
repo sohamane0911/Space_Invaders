@@ -59,6 +59,54 @@ laserl2_rect = pygame.Rect(0, 0, 64, 64)
 laserr1_rect = pygame.Rect(0, 0, 64, 64)
 laserr2_rect = pygame.Rect(0, 0, 64, 64)
 
+def laser_shoot_ready():
+    global laser_x, laser_y
+    global laser1l_active, laser1r_active, laser2l_active, laser2r_active
+
+    if not laser1l_active and not laser1r_active:
+        laser_x[0] = player_x + 45
+        laser_y[0] = player_y
+        laser1l_active = True
+
+        laser_x[2] = player_x - 15
+        laser_y[2] = player_y
+        laser1r_active = True
+
+    elif not laser2l_active and not laser2r_active:
+        laser_x[1] = player_x + 45
+        laser_y[1] = player_y
+        laser2l_active = True
+
+        laser_x[3] = player_x - 15
+        laser_y[3] = player_y
+        laser2r_active = True
+
+
+def laser_shoot_fire():
+    global laser_y
+    global laser1l_active, laser2l_active, laser1r_active, laser2r_active
+
+    if laser1l_active:
+        laser_y[0] -= laser_speed_y[0]
+        if laser_y[0] <= -50:
+            laser1l_active = False
+
+    if laser1r_active:
+        laser_y[2] -= laser_speed_y[0]
+        if laser_y[2] <= -50:
+            laser1r_active = False
+
+    if laser2l_active:
+        laser_y[1] -= laser_speed_y[0]
+        if laser_y[1] <= -50:
+            laser2l_active = False
+
+    if laser2r_active:
+        laser_y[3] -= laser_speed_y[0]
+        if laser_y[3] <= -50:
+            laser2r_active = False
+
+
 running = True
 
 while running:
@@ -67,6 +115,12 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                laser_shoot_ready()
+
+    laser_shoot_fire()
 
     screen.blit(main_menu_bg, (0, 0))
 
@@ -78,6 +132,15 @@ while running:
             enemy_x[i] = random.randint(0, screen_width - 96)
 
         screen.blit(enemy, (enemy_x[i], enemy_y[i]))
+
+    if laser1l_active:
+        pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
+    if laser1r_active:
+        pygame.draw.rect(screen, (255, 0, 0), (laser_x[2], laser_y[2], 5, 20))
+    if laser2l_active:
+        pygame.draw.rect(screen, (255, 0, 0), (laser_x[1], laser_y[1], 5, 20))
+    if laser2r_active:
+        pygame.draw.rect(screen, (255, 0, 0), (laser_x[3], laser_y[3], 5, 20))
 
     screen.blit(player, (player_x, player_y))
 
