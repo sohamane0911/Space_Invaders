@@ -107,6 +107,8 @@ def laser_shoot_fire():
             laser2r_active = False
 
 
+game_state = "play"
+
 running = True
 
 while running:
@@ -117,32 +119,40 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and game_state == "play":
                 laser_shoot_ready()
 
-    laser_shoot_fire()
+    if game_state == "play":
 
-    screen.blit(main_menu_bg, (0, 0))
+        laser_shoot_fire()
 
-    for i in range(len(enemy_x)):
-        enemy_y[i] += enemy_speed[i]
+        screen.blit(main_menu_bg, (0, 0))
 
-        if enemy_y[i] > screen_height:
-            enemy_y[i] = -100
-            enemy_x[i] = random.randint(0, screen_width - 96)
+        for i in range(len(enemy_x)):
+            enemy_y[i] += enemy_speed[i]
 
-        screen.blit(enemy, (enemy_x[i], enemy_y[i]))
+            if enemy_y[i] >= player_y:
+                game_state = "lost"
 
-    if laser1l_active:
-        pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
-    if laser1r_active:
-        pygame.draw.rect(screen, (255, 0, 0), (laser_x[2], laser_y[2], 5, 20))
-    if laser2l_active:
-        pygame.draw.rect(screen, (255, 0, 0), (laser_x[1], laser_y[1], 5, 20))
-    if laser2r_active:
-        pygame.draw.rect(screen, (255, 0, 0), (laser_x[3], laser_y[3], 5, 20))
+            if enemy_y[i] > screen_height:
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
 
-    screen.blit(player, (player_x, player_y))
+            screen.blit(enemy, (enemy_x[i], enemy_y[i]))
+
+        if laser1l_active:
+            pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
+        if laser1r_active:
+            pygame.draw.rect(screen, (255, 0, 0), (laser_x[2], laser_y[2], 5, 20))
+        if laser2l_active:
+            pygame.draw.rect(screen, (255, 0, 0), (laser_x[1], laser_y[1], 5, 20))
+        if laser2r_active:
+            pygame.draw.rect(screen, (255, 0, 0), (laser_x[3], laser_y[3], 5, 20))
+
+        screen.blit(player, (player_x, player_y))
+
+    elif game_state == "lost":
+        screen.fill((0, 0, 0))
 
     pygame.display.update()
 
