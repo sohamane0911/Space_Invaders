@@ -106,8 +106,7 @@ def laser_shoot_fire():
         if laser_y[3] <= -50:
             laser2r_active = False
 
-
-game_state = "play"
+game_state = "menu"
 
 running = True
 
@@ -119,10 +118,17 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and game_state == "play":
+
+            if game_state == "menu" and (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
+                game_state = "play"
+
+            elif game_state == "play" and event.key == pygame.K_SPACE:
                 laser_shoot_ready()
 
-    if game_state == "play":
+    if game_state == "menu":
+        screen.blit(main_menu_bg, (0, 0))
+
+    elif game_state == "play":
 
         laser_shoot_fire()
 
