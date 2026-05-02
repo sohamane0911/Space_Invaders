@@ -33,6 +33,7 @@ player_lives = pygame.transform.scale(
 player_x = 733
 player_y = 770
 player_speed = 20
+player_width = player.get_width()
 
 enemy = pygame.transform.scale(
     pygame.image.load("enemyShip.gif").convert(),
@@ -129,6 +130,20 @@ while running:
         screen.blit(main_menu_bg, (0, 0))
 
     elif game_state == "play":
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            player_x -= player_speed
+
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            player_x += player_speed
+
+        if player_x <= 0:
+            player_x = 0
+
+        if player_x >= screen_width - player_width:
+            player_x = screen_width - player_width
 
         laser_shoot_fire()
 
