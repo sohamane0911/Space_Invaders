@@ -12,6 +12,7 @@ screen_height = 900
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Space Invaders")
 
+# Day 3 – Asset loading (background + menu)
 main_menu_bg = pygame.transform.scale(
     pygame.image.load("SI ain menu.png").convert(),
     (1534, 900)
@@ -20,6 +21,7 @@ main_menu_bg = pygame.transform.scale(
 bg = pygame.image.load("bg moving.png").convert()
 bg_height = bg.get_height()
 
+# Day 4 – Player assets + basic setup
 player = pygame.transform.scale(
     pygame.image.load("ship.gif").convert(),
     (96, 96)
@@ -35,6 +37,7 @@ player_y = 770
 player_speed = 20
 player_width = player.get_width()
 
+# Day 5 – Multiple Enemies
 enemy = pygame.transform.scale(
     pygame.image.load("enemyShip.gif").convert(),
     (96, 96)
@@ -44,6 +47,9 @@ enemy_x = [random.randint(0, screen_width - 96) for _ in range(4)]
 enemy_y = [-50, -300, -600, -900]
 enemy_speed = [5, 5, 5, 5]
 
+enemy_survived = 0  # Day 11
+
+# Day 6 – Laser system (basic structure)
 laser_x = [733, 733, 748, 748]
 laser_y = [770, 770, 770, 770]
 
@@ -60,6 +66,7 @@ laserl2_rect = pygame.Rect(0, 0, 64, 64)
 laserr1_rect = pygame.Rect(0, 0, 64, 64)
 laserr2_rect = pygame.Rect(0, 0, 64, 64)
 
+# Day 7 – Shooting logic
 def laser_shoot_ready():
     global laser_x, laser_y
     global laser1l_active, laser1r_active, laser2l_active, laser2r_active
@@ -107,6 +114,8 @@ def laser_shoot_fire():
         if laser_y[3] <= -50:
             laser2r_active = False
 
+
+# Day 9 – Game states
 game_state = "menu"
 
 running = True
@@ -131,6 +140,7 @@ while running:
 
     elif game_state == "play":
 
+        # Day 10 – Player controls
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -149,6 +159,7 @@ while running:
 
         screen.blit(main_menu_bg, (0, 0))
 
+        # Day 11 – Enemy movement + survival logic
         for i in range(len(enemy_x)):
             enemy_y[i] += enemy_speed[i]
 
@@ -156,11 +167,13 @@ while running:
                 game_state = "lost"
 
             if enemy_y[i] > screen_height:
+                enemy_survived += 1
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
 
             screen.blit(enemy, (enemy_x[i], enemy_y[i]))
 
+        # draw lasers
         if laser1l_active:
             pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
         if laser1r_active:
