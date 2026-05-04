@@ -37,6 +37,8 @@ player_y = 770
 player_speed = 20
 player_width = player.get_width()
 
+player_rect = pygame.Rect(player_x, player_y, 96, 96)
+
 # Day 5 – Multiple Enemies
 enemy = pygame.transform.scale(
     pygame.image.load("enemyShip.gif").convert(),
@@ -47,7 +49,9 @@ enemy_x = [random.randint(0, screen_width - 96) for _ in range(4)]
 enemy_y = [-50, -300, -600, -900]
 enemy_speed = [5, 5, 5, 5]
 
-enemy_survived = 0  # Day 11
+enemy_survived = 0
+
+enemy_rect = pygame.Rect(0, 0, 96, 96)
 
 # Day 6 – Laser system (basic structure)
 laser_x = [733, 733, 748, 748]
@@ -155,13 +159,24 @@ while running:
         if player_x >= screen_width - player_width:
             player_x = screen_width - player_width
 
+        # update player rect
+        player_rect.x = player_x
+        player_rect.y = player_y
+
         laser_shoot_fire()
 
         screen.blit(main_menu_bg, (0, 0))
 
-        # Day 11 – Enemy movement + survival logic
+        # Day 11 + 12 – Enemy movement + collision
         for i in range(len(enemy_x)):
             enemy_y[i] += enemy_speed[i]
+
+            enemy_rect.x = enemy_x[i]
+            enemy_rect.y = enemy_y[i]
+
+            # player vs enemy
+            if player_rect.colliderect(enemy_rect):
+                game_state = "lost"
 
             if enemy_y[i] >= player_y:
                 game_state = "lost"
@@ -170,6 +185,33 @@ while running:
                 enemy_survived += 1
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
+            # update laser rects
+            laserl1_rect.topleft = (laser_x[0], laser_y[0])
+            laserr1_rect.topleft = (laser_x[2], laser_y[2])
+            laserl2_rect.topleft = (laser_x[1], laser_y[1])
+            laserr2_rect.topleft = (laser_x[3], laser_y[3])
+
+            # laser vs enemy
+            if laser1l_active and laserl1_rect.colliderect(enemy_rect):
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
+                laser1l_active = False
+
+            elif laser1r_active and laserr1_rect.colliderect(enemy_rect):
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
+                laser1r_active = False
+
+            elif laser2l_active and laserl2_rect.colliderect(enemy_rect):
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
+                laser2l_active = False
+
+            elif laser2r_active and laserr2_rect.colliderect(enemy_rect):
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
+                laser2r_active = False
 
             screen.blit(enemy, (enemy_x[i], enemy_y[i]))
 
