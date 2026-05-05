@@ -50,7 +50,6 @@ enemy_y = [-50, -300, -600, -900]
 enemy_speed = [5, 5, 5, 5]
 
 enemy_survived = 0
-
 enemy_rect = pygame.Rect(0, 0, 96, 96)
 
 # Day 6 – Laser system (basic structure)
@@ -119,6 +118,23 @@ def laser_shoot_fire():
             laser2r_active = False
 
 
+# Day 13 – Explosion system
+explosion_frames = [
+    pygame.transform.scale(pygame.image.load('frame_00_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_01_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_02_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_03_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_04_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_05_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_06_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_08_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_09_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_10_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_11_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+]
+
+explosions = []
+
 # Day 9 – Game states
 game_state = "menu"
 
@@ -144,7 +160,6 @@ while running:
 
     elif game_state == "play":
 
-        # Day 10 – Player controls
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -159,7 +174,6 @@ while running:
         if player_x >= screen_width - player_width:
             player_x = screen_width - player_width
 
-        # update player rect
         player_rect.x = player_x
         player_rect.y = player_y
 
@@ -167,7 +181,6 @@ while running:
 
         screen.blit(main_menu_bg, (0, 0))
 
-        # Day 11 + 12 – Enemy movement + collision
         for i in range(len(enemy_x)):
             enemy_y[i] += enemy_speed[i]
 
@@ -176,6 +189,7 @@ while running:
 
             # player vs enemy
             if player_rect.colliderect(enemy_rect):
+                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 game_state = "lost"
 
             if enemy_y[i] >= player_y:
@@ -194,26 +208,41 @@ while running:
 
             # laser vs enemy
             if laser1l_active and laserl1_rect.colliderect(enemy_rect):
+                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser1l_active = False
 
             elif laser1r_active and laserr1_rect.colliderect(enemy_rect):
+                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser1r_active = False
 
             elif laser2l_active and laserl2_rect.colliderect(enemy_rect):
+                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser2l_active = False
 
             elif laser2r_active and laserr2_rect.colliderect(enemy_rect):
+                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser2r_active = False
 
             screen.blit(enemy, (enemy_x[i], enemy_y[i]))
+
+        # draw explosions
+        current_time = pygame.time.get_ticks()
+        for explosion in explosions[:]:
+            x, y, start_time = explosion
+            frame = (current_time - start_time) // 50
+
+            if frame < len(explosion_frames):
+                screen.blit(explosion_frames[int(frame)], (x, y))
+            else:
+                explosions.remove(explosion)
 
         # draw lasers
         if laser1l_active:
