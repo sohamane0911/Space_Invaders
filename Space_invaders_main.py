@@ -69,6 +69,27 @@ laserl2_rect = pygame.Rect(0, 0, 64, 64)
 laserr1_rect = pygame.Rect(0, 0, 64, 64)
 laserr2_rect = pygame.Rect(0, 0, 64, 64)
 
+# Day 13 – Explosion system
+explosion_frames = [
+    pygame.transform.scale(pygame.image.load('frame_00_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_01_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_02_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_03_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_04_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_05_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_06_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_08_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_09_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_10_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+    pygame.transform.scale(pygame.image.load('frame_11_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
+]
+
+explosions = []
+
+# Day 14 – Score + UI
+font = pygame.font.Font('PixeloidSans.ttf', 48)
+score = 0
+
 # Day 7 – Shooting logic
 def laser_shoot_ready():
     global laser_x, laser_y
@@ -117,23 +138,6 @@ def laser_shoot_fire():
         if laser_y[3] <= -50:
             laser2r_active = False
 
-
-# Day 13 – Explosion system
-explosion_frames = [
-    pygame.transform.scale(pygame.image.load('frame_00_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_01_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_02_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_03_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_04_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_05_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_06_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_08_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_09_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_10_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-    pygame.transform.scale(pygame.image.load('frame_11_delay-0.1s-Photoroom.png').convert_alpha(), (120, 120)),
-]
-
-explosions = []
 
 # Day 9 – Game states
 game_state = "menu"
@@ -212,31 +216,37 @@ while running:
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser1l_active = False
+                score += 1
 
             elif laser1r_active and laserr1_rect.colliderect(enemy_rect):
                 explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser1r_active = False
+                score += 1
 
             elif laser2l_active and laserl2_rect.colliderect(enemy_rect):
                 explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser2l_active = False
+                score += 1
 
             elif laser2r_active and laserr2_rect.colliderect(enemy_rect):
                 explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
                 laser2r_active = False
+                score += 1
 
             screen.blit(enemy, (enemy_x[i], enemy_y[i]))
 
         # draw explosions
         current_time = pygame.time.get_ticks()
+
         for explosion in explosions[:]:
             x, y, start_time = explosion
+
             frame = (current_time - start_time) // 50
 
             if frame < len(explosion_frames):
@@ -247,12 +257,22 @@ while running:
         # draw lasers
         if laser1l_active:
             pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
+
         if laser1r_active:
             pygame.draw.rect(screen, (255, 0, 0), (laser_x[2], laser_y[2], 5, 20))
+
         if laser2l_active:
             pygame.draw.rect(screen, (255, 0, 0), (laser_x[1], laser_y[1], 5, 20))
+
         if laser2r_active:
             pygame.draw.rect(screen, (255, 0, 0), (laser_x[3], laser_y[3], 5, 20))
+
+        # draw score UI
+        text_surface = font.render(f'Score : {score}', True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (10, 2)
+
+        screen.blit(text_surface, text_rect)
 
         screen.blit(player, (player_x, player_y))
 
