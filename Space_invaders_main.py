@@ -39,18 +39,29 @@ player_width = player.get_width()
 
 player_rect = pygame.Rect(player_x, player_y, 96, 96)
 
+player_lives_x = [60, 110, 160]
+player_lives_y = [80, 80, 80]
+
 # Day 5 – Multiple Enemies
 enemy = pygame.transform.scale(
     pygame.image.load("enemyShip.gif").convert(),
     (96, 96)
 )
 
-enemy_x = [random.randint(0, screen_width - 96) for _ in range(4)]
-enemy_y = [-50, -300, -600, -900]
+enemy_crossed = pygame.transform.scale(
+    pygame.image.load("enemyShip.gif").convert(),
+    (32, 32)
+)
+
+enemy_x = [284, 458, 750, 1359]
+enemy_y = [-50, -400, -800, -1200]
 enemy_speed = [5, 5, 5, 5]
 
 enemy_survived = 0
 enemy_rect = pygame.Rect(0, 0, 96, 96)
+
+enemy_crossed_x = [10, 60, 110, 160, 210]
+enemy_crossed_y = [130, 130, 130, 130, 130]
 
 # Day 6 – Laser system (basic structure)
 laser_x = [733, 733, 748, 748]
@@ -89,6 +100,9 @@ explosions = []
 # Day 14 – Score + UI
 font = pygame.font.Font('PixeloidSans.ttf', 48)
 score = 0
+
+# Day 15 – Lives + lose conditions
+player_lost = 0
 
 # Day 7 – Shooting logic
 def laser_shoot_ready():
@@ -153,7 +167,10 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if game_state == "menu" and (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
+            if game_state == "menu" and (
+                event.key == pygame.K_RETURN or
+                event.key == pygame.K_KP_ENTER
+            ):
                 game_state = "play"
 
             elif game_state == "play" and event.key == pygame.K_SPACE:
@@ -193,16 +210,34 @@ while running:
 
             # player vs enemy
             if player_rect.colliderect(enemy_rect):
-                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
-                game_state = "lost"
 
-            if enemy_y[i] >= player_y:
-                game_state = "lost"
+                explosions.append([
+                    enemy_x[i],
+                    enemy_y[i],
+                    pygame.time.get_ticks()
+                ])
 
-            if enemy_y[i] > screen_height:
-                enemy_survived += 1
+                player_lost += 1
+
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
+                player_x = screen_width // 2
+
+            # enemy survived
+            if enemy_y[i] > screen_height:
+
+                enemy_survived += 1
+
+                enemy_y[i] = -100
+                enemy_x[i] = random.randint(0, screen_width - 96)
+
+            # game over conditions
+            if enemy_survived >= 5:
+                game_state = "lost"
+
+            if player_lost >= 3:
+                game_state = "lost"
 
             # update laser rects
             laserl1_rect.topleft = (laser_x[0], laser_y[0])
@@ -212,31 +247,63 @@ while running:
 
             # laser vs enemy
             if laser1l_active and laserl1_rect.colliderect(enemy_rect):
-                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
+
+                explosions.append([
+                    enemy_x[i],
+                    enemy_y[i],
+                    pygame.time.get_ticks()
+                ])
+
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
                 laser1l_active = False
+
                 score += 1
 
             elif laser1r_active and laserr1_rect.colliderect(enemy_rect):
-                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
+
+                explosions.append([
+                    enemy_x[i],
+                    enemy_y[i],
+                    pygame.time.get_ticks()
+                ])
+
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
                 laser1r_active = False
+
                 score += 1
 
             elif laser2l_active and laserl2_rect.colliderect(enemy_rect):
-                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
+
+                explosions.append([
+                    enemy_x[i],
+                    enemy_y[i],
+                    pygame.time.get_ticks()
+                ])
+
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
                 laser2l_active = False
+
                 score += 1
 
             elif laser2r_active and laserr2_rect.colliderect(enemy_rect):
-                explosions.append([enemy_x[i], enemy_y[i], pygame.time.get_ticks()])
+
+                explosions.append([
+                    enemy_x[i],
+                    enemy_y[i],
+                    pygame.time.get_ticks()
+                ])
+
                 enemy_y[i] = -100
                 enemy_x[i] = random.randint(0, screen_width - 96)
+
                 laser2r_active = False
+
                 score += 1
 
             screen.blit(enemy, (enemy_x[i], enemy_y[i]))
@@ -245,6 +312,7 @@ while running:
         current_time = pygame.time.get_ticks()
 
         for explosion in explosions[:]:
+
             x, y, start_time = explosion
 
             frame = (current_time - start_time) // 50
@@ -256,24 +324,68 @@ while running:
 
         # draw lasers
         if laser1l_active:
-            pygame.draw.rect(screen, (255, 0, 0), (laser_x[0], laser_y[0], 5, 20))
+            pygame.draw.rect(
+                screen,
+                (255, 0, 0),
+                (laser_x[0], laser_y[0], 5, 20)
+            )
 
         if laser1r_active:
-            pygame.draw.rect(screen, (255, 0, 0), (laser_x[2], laser_y[2], 5, 20))
+            pygame.draw.rect(
+                screen,
+                (255, 0, 0),
+                (laser_x[2], laser_y[2], 5, 20)
+            )
 
         if laser2l_active:
-            pygame.draw.rect(screen, (255, 0, 0), (laser_x[1], laser_y[1], 5, 20))
+            pygame.draw.rect(
+                screen,
+                (255, 0, 0),
+                (laser_x[1], laser_y[1], 5, 20)
+            )
 
         if laser2r_active:
-            pygame.draw.rect(screen, (255, 0, 0), (laser_x[3], laser_y[3], 5, 20))
+            pygame.draw.rect(
+                screen,
+                (255, 0, 0),
+                (laser_x[3], laser_y[3], 5, 20)
+            )
 
         # draw score UI
-        text_surface = font.render(f'Score : {score}', True, (255, 255, 255))
+        text_surface = font.render(
+            f'Score : {score}',
+            True,
+            (255, 255, 255)
+        )
+
         text_rect = text_surface.get_rect()
         text_rect.topleft = (10, 2)
 
         screen.blit(text_surface, text_rect)
 
+        # lives display
+        if player_lost == 0:
+            for i in range(3):
+                screen.blit(
+                    player_lives,
+                    (player_lives_x[i], player_lives_y[i])
+                )
+
+        if player_lost == 1:
+            for i in range(2):
+                screen.blit(
+                    player_lives,
+                    (player_lives_x[i], player_lives_y[i])
+                )
+
+        if player_lost == 2:
+            for i in range(1):
+                screen.blit(
+                    player_lives,
+                    (player_lives_x[i], player_lives_y[i])
+                )
+
+        
         screen.blit(player, (player_x, player_y))
 
     elif game_state == "lost":
